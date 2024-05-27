@@ -15,7 +15,7 @@ public class Managers : MonoBehaviour
     
     public static InputManager Input { get { return Instance._input;} }
     public static ResourceManager Resource { get { return Instance._resource; } }
-    public static SceneManagerEX Scece { get { return Instance._Scene; } }
+    public static SceneManagerEX Scene { get { return Instance._Scene; } }
     public static SoundManager Sound { get { return Instance._sound; } }
     public static UIManager UI { get { return Instance._ui; } }
      
@@ -47,5 +47,12 @@ public class Managers : MonoBehaviour
 
             s_instance._sound.Init();
         }
+    }
+    public static void Clear()
+    {
+        Sound.Clear();
+        Input.Clear();
+        Scene.Clear();
+        UI.clear();
     }
 }

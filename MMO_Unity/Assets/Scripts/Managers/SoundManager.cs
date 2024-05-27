@@ -9,6 +9,7 @@ public class SoundManager
     //包按       -> AudioLister
 
     AudioSource[] _audioSources = new AudioSource[(int)Define.Sound.MaxCount];
+    Dictionary<string, AudioClip> _audioClips = new Dictionary<string, AudioClip>(); //某教开劝
 
     public void Init()
     {
@@ -30,29 +31,77 @@ public class SoundManager
         }
     }
 
-    public void Play(Define.Sound type, string path, float pitch=1.0f)
+    public void Clear()
     {
-        if (path.Contains("Sounds/") == false)
-            path = $"Sound/{path}";
-
-        if(type == Define.Sound.Bgm)
+        foreach(AudioSource audioSource in _audioSources)
         {
-            AudioClip audio = Managers.Resource.Load<AudioClip>(path);
-            if(audio = null ) 
-            { 
-                Debug.Log($"Sound Error {path}"); return; 
+            audioSource.clip = null;
+            audioSource.Stop();
+        }
+        _audioClips.Clear();
+    }
+
+    public void Play(string path, Define.Sound type = Define.Sound.Effect, float pitch=1.0f)
+    {
+        AudioClip audioClipe = GetOrAddAudioClip(path, type);
+        Play(audioClipe, type, pitch);
+    }
+
+    public void Play(AudioClip audioClip, Define.Sound type = Define.Sound.Effect, float pitch = 1.0f)
+    {
+        if (audioClip == null)
+            return;
+
+        if (type == Define.Sound.Bgm)
+        {
+            AudioSource audioSource = _audioSources[(int)Define.Sound.Bgm];
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
             }
+
+            audioSource.pitch = pitch;
+            audioSource.clip = audioClip;
+            audioSource.Play();
         }
         else
         {
-            AudioClip audio = Managers.Resource.Load<AudioClip>(path);
-            if (audio = null) 
-            { 
-                Debug.Log($"Sound Error {path}"); return; 
-            }
             AudioSource audioSource = _audioSources[(int)Define.Sound.Effect];
             audioSource.pitch = pitch;
-            audioSource.PlayOneShot(audio);
+            audioSource.PlayOneShot(audioClip);
         }
+    }
+
+    AudioClip GetOrAddAudioClip(string path, Define.Sound type = Define.Sound.Effect)
+    {
+        if (path.Contains("Sounds/") == false)
+            path = $"Sounds/{path}";
+
+        AudioClip audioClip = null;
+
+        if (type == Define.Sound.Bgm)
+        {
+            audioClip = Managers.Resource.Load<AudioClip>(path);
+        }
+        else
+        {
+            if (_audioClips.TryGetValue(path, out audioClip) == false)
+            {
+                audioClip = Managers.Resource.Load<AudioClip>(path);
+                _audioClips.Add(path, audioClip);
+            }
+
+            if (audioClip == null)
+            {
+                Debug.Log($"AudioClip Missing! {path}");
+            }
+        }
+
+        if (audioClip == null)
+        {
+            Debug.Log($"AudioClip Missing! {path}");
+        }
+
+        return audioClip;
     }
 }

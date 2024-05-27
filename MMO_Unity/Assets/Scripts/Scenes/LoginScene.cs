@@ -15,7 +15,7 @@ public class LoginScene : BaseScene
     {
         if(Input.GetKeyDown(KeyCode.Q))
         {
-            Managers.Scece.LoadScene(Define.Scene.Game);
+            Managers.Scene.LoadScene(Define.Scene.Game);
         }
     }
 
